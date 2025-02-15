@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 )
@@ -38,7 +39,12 @@ func (c *Client) GenerateMealPlan(ctx context.Context, targetCalories int, timeF
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+
+		}
+	}(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("generate meal plan: status code tidak terduga %d", resp.StatusCode)
@@ -63,7 +69,12 @@ func (c *Client) GetRecipeInformation(ctx context.Context, recipeID int, include
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+
+		}
+	}(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("get recipe information: status code tidak terduga %d", resp.StatusCode)
