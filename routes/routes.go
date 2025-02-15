@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"mealplanner/controllers"
@@ -10,6 +11,23 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine, db *gorm.DB, jwtSecret, spoonacularApiKey, spoonacularBaseUrl string, spoonacularTimeout time.Duration) {
+	// Konfigurasi CORS untuk domain tertentu.
+	corsConfig := cors.Config{
+		AllowOrigins:     []string{"https://eatgorithm.fuadfakhruz.id"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}
+	r.Use(cors.New(corsConfig))
+
+	// Tambahkan endpoint /health untuk memeriksa status aplikasi.
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status": "ok",
+		})
+	})
+
 	authController := controllers.AuthController{DB: db, JwtSecret: jwtSecret}
 	userController := controllers.UserController{DB: db}
 
